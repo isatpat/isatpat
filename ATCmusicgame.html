@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            overflow: none;
+            background-image: url('musicstaff.png');
+            background-repeat: no-repeat;
+            background-attachment: fixed;  
+            background-size: cover;
+        }
+    </style>
+</head>
+ 
+<body>
+    <!-- COMMENTED OUT
+    <div class="app">
+        <header>
+            <h1>Music Game</h1>
+            <p>Make music with one button</p>
+        </header>
+    </div>
+-->
+ 
+    </div>
+    <canvas id="canvas"></canvas>
+    <div style="display:none;">
+        <img id="source" src="musicnotes.png" width="3" height="3">
+        <img id="background" src="musicstaff.png" width="124" height="124">
+    </div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const image = document.getElementById('source');
+        const staff = document.getElementById('background');
+        
+ 
+        const coords = [];
+ 
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+ 
+        var x = 0, y = 0;
+       
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = "#474973";
+        //ctx.fillRect(0, 0, canvas.width, 50);
+ 
+        // Stores picture color data (not including GUIs)
+        // const imageData = ctx.createImageData(canvas.width, canvas.height);
+ 
+        loop();
+        // initialize the canvas
+ 
+        // update the rectangle
+       
+       function drawBackground()
+       {
+        ctx.drawImage(staff, 0, 0, 1240, 1240);     
+       }
+        function update_rectangle_leftright() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(x - 10, 0, 20, canvas.height);
+            // ctx.fillRect(0, y - 10, canvas.width, 20);
+            drawLines();
+            ++x;
+            x %= canvas.width;
+        }
+ 
+        function update_rectangle_updown() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, y - 10, canvas.width, 20);
+            ctx.fillRect(x - 10, 0, 20, canvas.height);
+            drawLines();
+            ++y;
+            y %= canvas.height;
+        }
+       
+        // on click --> stop the rectangle from ov ing and print the x and y coordinate
+ 
+        function drawLines() {
+            ctx.globalAlpha = 1;
+            for(let i =0; i<coords.length; i++){
+                //ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // ctx.beginPath();
+                // ctx.arc(coords[i].x,coords[i].y,6,0,Math.PI*2   );code for dot instead of music note
+                // ctx.fill();
+                // ctx.closePath();
+ 
+                ctx.drawImage(image, coords[i].x - 15, coords[i].y - 15, 30, 30);
+            }
+           
+ 
+            //ctx.fillStyle = "#474973";
+            ctx.globalAlpha = 0.5; //transparency of the lines
+        }
+ 
+        function loop(){
+            x = 0;
+            y = 0;
+            // on click stop the loop
+            let continueloop = true;
+            document.addEventListener('keydown', function _listener(e) {
+                if (e.key !== ' ')
+                    return;
+                e.preventDefault();  
+                continueloop = false;
+                document.removeEventListener('keydown', _listener, true);
+            });
+ 
+            function updateUpDownTimeout() {
+                update_rectangle_updown();
+                if (continueloop) {
+                    setTimeout(updateUpDownTimeout, 50);
+                } else {
+                    // We have x and y; end loop
+                   // round x and y here!
+                    coords.push({x: x, y: y});
+                    loop();
+                }
+            }
+ 
+            function updateLeftRightTimeout() {
+                drawBackground();
+                update_rectangle_leftright();
+                if (continueloop) {
+                    setTimeout(updateLeftRightTimeout, 50);
+                } else {
+                    continueloop = true;
+                    setTimeout(updateUpDownTimeout, 50);
+                    document.addEventListener('keydown', function _listener(e) {
+                        if (e.key !== ' ')
+                            return;
+                        continueloop = false;
+                        e.preventDefault();
+                        //document.getElementById('x_y').innerHTML = x+" "+y;
+                       
+                        document.removeEventListener('keydown', _listener, true);
+                    })
+                }
+            }
+       
+            setTimeout(updateLeftRightTimeout, 50);
+            // timer
+            // call update
+        }
+ 
+    </script>
+</body>
+</html>
